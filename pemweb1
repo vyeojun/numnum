@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manajemen Menu</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous"
+  />
+  <!-- SweetAlert CSS (Optional, as SweetAlert uses JS) -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- Font Awesome for Icons (Optional) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pzw1Uu+0x5O0gf1O9yHkVQH8bQzI9vqX0lG1+KJkV4U6ZrEYYzEvdHjZlFWV7+nJdD2f9c7P/UuAQ35D+S6QGw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    .table-responsive {
+      margin-top: 20px;
+    }
+    form {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-4">Manajemen Menu</h1>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Harga</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="menuTable">
+          <tr>
+            <td>1</td>
+            <td>Nasdsa</td>
+            <td>21321312</td>
+            <td>
+              <button class="btn btn-primary btn-sm edit"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+              <button class="btn btn-danger btn-sm delete"><i class="fa-regular fa-rectangle-xmark"></i> Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Ayam</td>
+            <td>23.000</td>
+            <td>
+              <button class="btn btn-primary btn-sm edit"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+              <button class="btn btn-danger btn-sm delete"><i class="fa-regular fa-rectangle-xmark"></i> Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Sadas</td>
+            <td>123123</td>
+            <td>
+              <button class="btn btn-primary btn-sm edit"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+              <button class="btn btn-danger btn-sm delete"><i class="fa-regular fa-rectangle-xmark"></i> Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <form id="addForm">
+      <div class="mb-3">
+        <label for="nama" class="form-label">Nama</label>
+        <input type="text" class="form-control" id="nama" required />
+        <div class="form-text text-muted">Nama produk (minimal 6 karakter)</div>
+      </div>
+      <div class="mb-3">
+        <label for="harga" class="form-label">Harga</label>
+        <input type="text" class="form-control" id="harga" required />
+        <div class="form-text text-muted">Hanya angka, tidak boleh mengandung alfabet</div>
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">Add</button>
+      <button type="button" class="btn btn-secondary d-none" id="cancelBtn">Cancel</button>
+    </form>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      let isEditing = false;
+      let editRow = null;
+
+      // Fungsi untuk menampilkan alert SweetAlert
+      function showAlert(title, text, icon) {
+        swal(title, text, icon);
+      }
+
+      // Fungsi untuk mereset form
+      function resetForm() {
+        $("#nama").val('');
+        $("#harga").val('');
+        $("#submitBtn").text("Add").removeClass("btn-warning").addClass("btn-primary");
+        $("#cancelBtn").addClass("d-none");
+        isEditing = false;
+        editRow = null;
+      }
+
+      // Tambah Menu
+      $("#addForm").on("submit", function (e) {
+        e.preventDefault();
+        let nama = $("#nama").val().trim();
+        let harga = $("#harga").val().trim();
+
+        // Validasi Nama
+        if (nama.length < 6) {
+          showAlert("Peringatan", "Nama harus memiliki minimal 6 karakter!", "warning");
+          return;
+        }
+
+        // Validasi Harga
+        if (isNaN(harga) || harga === "") {
+          showAlert("Peringatan", "Harga harus berupa angka!", "warning");
+          return;
+        }
+
+        if (!isEditing) {
+          // Menambah Menu Baru
+          let jmlKolom = $("#menuTable tr").length + 1;
+          $("#menuTable").append(`
+            <tr>
+              <td>${jmlKolom}</td>
+              <td>${nama}</td>
+              <td>${harga}</td>
+              <td>
+                <button class="btn btn-primary btn-sm edit"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+                <button class="btn btn-danger btn-sm delete"><i class="fa-regular fa-rectangle-xmark"></i> Delete</button>
+              </td>
+            </tr>
+          `);
+          showAlert("Berhasil", "Menu ditambahkan!", "success");
+        } else {
+          // Mengupdate Menu yang Sedang Diedit
+          editRow.find("td:eq(1)").text(nama);
+          editRow.find("td:eq(2)").text(harga);
+          showAlert("Berhasil", "Menu diperbarui!", "success");
+          resetForm();
+        }
+
+        // Reset Form
+        resetForm();
+      });
+
+      // Edit Menu
+      $(document).on("click", ".edit", function () {
+        let row = $(this).closest("tr");
+        let nama = row.find("td:eq(1)").text();
+        let harga = row.find("td:eq(2)").text();
+
+        $("#nama").val(nama);
+        $("#harga").val(harga);
+        $("#submitBtn").text("Update").removeClass("btn-primary").addClass("btn-warning");
+        $("#cancelBtn").removeClass("d-none");
+
+        isEditing = true;
+        editRow = row;
+      });
+
+      // Batal Edit
+      $("#cancelBtn").on("click", function () {
+        resetForm();
+      });
+
+      // Delete Menu
+      $(document).on("click", ".delete", function () {
+        let row = $(this).closest("tr");
+        swal({
+          title: "Yakin?",
+          text: "Apakah Anda yakin ingin menghapus menu ini?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            row.remove();
+           
+            // Re-nomori baris
+            $("#menuTable tr").each(function(index) {
+              $(this).find("td:first").text(index + 1);
+            });
+            showAlert("Terhapus", "Menu telah dihapus.", "success");
+          } else {
+            swal("Menu aman.");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
